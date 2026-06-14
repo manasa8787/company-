@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تطبيق الحجوزات الاحترافي المطور</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+
+        :root {
+            --bg-color: #f7f9fc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --text-muted: #718096;
+            --primary-color: #3182ce;
+            --primary-hover: #2b6cb0;
+            --input-bg: #edf2f7;
+            --input-border: #e2e8f0;
+            --error-color: #e53e3e;
+            --success-color: #38a169;
+            --warning-color: #dd6b20;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .flat-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px 18px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--input-border);
+            margin-bottom: 20px;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .brand-logo {
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, var(--primary-color), #63b3ed);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 26px;
+            font-weight: bold;
+            margin: 0 auto 15px auto;
+            box-shadow: 0 4px 10px rgba(49, 130, 206, 0.2);
+        }
+
+        .brand-name {
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .brand-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .user-tabs {
+            display: flex;
+            background-color: var(--input-bg);
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            gap: 2px;
+        }
+
+        .user-tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 10px 4px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .user-tab-btn.active {
+            background-color: var(--card-bg);
+            color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-group {
+            text-align: right;
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 13px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            color: var(--text-color);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            text-align: right;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            background-color: var(--card-bg);
+        }
+
+        button, .user-tab-btn, .tab-btn {
+            transition: transform 0.1s ease;
+        }
+        button:active, .user-tab-btn:active, .tab-btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--success-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 5px;
+            box-shadow: 0 2px 4px rgba(56, 161, 105, 0.15);
+        }
+
+        .btn-admin-toggle {
+            width: 100%;
+            background: none;
+            border: 1px dashed var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .dashboard-screen {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .dash-header-card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--input-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .dash-title {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .btn-logout {
+            background-color: transparent;
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            padding: 14px 10px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--input-border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-val {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-val.blue { color: var(--primary-color); }
+        .stat-val.orange { color: var(--warning-color); }
+        .stat-val.green { color: var(--success-color); }
+
+        .stat-lbl {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .config-card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 14px;
+            border: 1px solid var(--input-border);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .config-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .config-title {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .input-short {
+            width: 100px;
+            padding: 6px;
+            text-align: center;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            border-radius: 6px;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 12px;
+        }
+
+        .search-container {
+            margin-bottom: 15px;
+        }
+
+        .filter-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 15px;
+            border: 1px solid var(--input-border);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            padding-right: 4px;
+        }
+
+        .appointments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .appointment-card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 15px;
+            border: 1px solid var(--input-border);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-right: 5px solid #cbd5e0;
+            transition: all 0.3s ease;
+        }
+
+        .appointment-card.status-waiting { border-right-color: var(--warning-color); }
+        .appointment-card.status-confirmed { border-right-color: var(--success-color); }
+        .appointment-card.status-postponed { border-right-color: var(--primary-color); }
+        .appointment-card.status-rejected { border-right-color: var(--error-color); }
+
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .main-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .badge.waiting { background-color: #feebc8; color: var(--warning-color); }
+        .badge.confirmed { background-color: #c6f6d5; color: var(--success-color); }
+        .badge.postponed { background-color: #e2e8f0; color: #4a5568; }
+        .badge.rejected { background-color: #fed7d7; color: var(--error-color); }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 5px;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            font-size: 13px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-label {
+            color: var(--text-muted);
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .detail-value.highlight {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .postpone-box, .reject-box {
+            background-color: #f8fafc;
+            border: 1px dashed var(--input-border);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 2px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .postpone-box input, .reject-box input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 2px;
+            border-top: 1px solid var(--input-border);
+            padding-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            flex: 1;
+            min-width: 75px;
+            padding: 9px 4px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-confirm { background-color: var(--success-color); color: white; }
+        .btn-postpone { background-color: #feebc8; color: var(--warning-color); }
+        .btn-reject { background-color: #fed7d7; color: var(--error-color); }
+        .btn-delete { background-color: #718096; color: white; }
+
+        .status-result-container {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-note {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 25px;
+            width: 100%;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 12px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+            font-weight: 700;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- ================= 1. واجهة الحجز والمتابعة العامة ================= -->
+        <div id="userBookingScreen" class="flat-card">
+            <div class="brand-logo" id="mainLogoLetter">ح</div>
+            <div class="brand-name" id="displaySystemName">منصة الحجز الذكية</div>
+            <div class="brand-subtitle">تقديم ومتابعة الحجوزات الفورية الشاملة</div>
+
+            <div class="user-tabs">
+                <button id="userTabClinic" class="user-tab-btn active" onclick="switchUserForm('clinic')">حجز العيادة</button>
+                <button id="userTabCompany" class="user-tab-btn" onclick="switchUserForm('company')">حجز الشركة</button>
+                <button id="userTabStatus" class="user-tab-btn" onclick="switchUserForm('status')">استعلام عن حجز</button>
+            </div>
+
+            <!-- استمارة العيادات الطبية -->
+            <form id="formUserClinic" onsubmit="submitUserClinic(event)">
+                <div class="form-group">
+                    <label>اسم المريض الثلاثي</label>
+                    <input type="text" id="pName" class="form-control" placeholder="أدخل اسم المريض كاملاً" required>
+                </div>
+                <div class="form-group">
+                    <label>رقم هاتف المريض</label>
+                    <input type="tel" id="pPhone" class="form-control" placeholder="07xxxxxxxx" required>
+                </div>
+                <div class="form-group">
+                    <label>العيادة والقسم المطلوب</label>
+                    <select id="pClinic" class="form-control" required>
+                        <option value="عيادة الأسنان">عيادة الأسنان</option>
+                        <option value="عيادة الجلدية">عيادة الجلدية</option>
+                        <option value="عيادة الباطنية">عيادة الباطنية</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>التاريخ والوقت المطلوب</label>
+                    <input type="datetime-local" id="pDateTime" class="form-control" required>
+                </div>
+                <button type="submit" class="btn-submit">إرسال الحجز وتأكيد بالواتساب</button>
+            </form>
+
+            <!-- استمارة حجز الشركات -->
+            <form id="formUserCompany" onsubmit="submitUserCompany(event)" style="display: none;">
+                <div class="form-group">
+                    <label>اسم الشركة</label>
+                    <input type="text" id="cName" class="form-control" placeholder="اسم الشركة التجاري" required>
+                </div>
+                <div class="form-group">
+                    <label>اسم المندوب ورقم هاتفه</label>
+                    <input type="text" id="cDelegate" class="form-control" placeholder="الاسم - 07xxxxxxxx" required>
+                </div>
+                <div class="form-group">
+                    <label>مبلغ الاستحصال</label>
+                    <input type="text" id="cAmount" class="form-control" placeholder="مثال: 500000" oninput="formatCurrency(this)" required>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ ووقت الموعد المطلوب</label>
+                    <input type="datetime-local" id="cDate" class="form-control" required>
+                </div>
+                <button type="submit" class="btn-submit">إرسال الحجز وتأكيد بالواتساب</button>
+            </form>
+
+            <!-- واجهة استعلام المراجعين -->
+            <div id="divUserStatusSearch" style="display: none;">
+                <div class="form-group">
+                    <label>أدخل اسم الشركة، المندوب، أو رقم الهاتف</label>
+                    <input type="text" id="searchStatusPhone" class="form-control" placeholder="ابحث هنا عن حالة حجزك..." oninput="liveCheckStatus()">
+                </div>
+                <div class="section-title" style="font-size:13px; color:var(--text-muted);">نتائج الاستعلام المطابقة:</div>
+                <div id="statusResultContainer" class="status-result-container"></div>
+            </div>
+
+            <button class="btn-admin-toggle" id="btnGoToLogin" onclick="showLoginScreen()">دخول الإدارة ←</button>
+        </div>
+
+        <!-- ================= 2. شاشة تسجيل دخول الإدارة الديناميكية ================= -->
+        <div id="loginScreen" class="flat-card" style="display: none;">
+            <div class="brand-logo">ق</div>
+            <div class="brand-name" id="loginScreenTitle">بوابة الإدارة</div>
+            <div class="brand-subtitle">سجل دخولك لإدارة العيادات والشركات</div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>البريد الإلكتروني للمدير</label>
+                    <input type="email" id="adminEmail" class="form-control" placeholder="example@domain.com" required>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="adminPassword" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-submit" style="background-color: var(--primary-color);">تسجيل الدخول</button>
+                <div id="errorMessage" class="error-message"></div>
+            </form>
+            <button class="btn-admin-toggle" style="border-color: var(--text-muted); color: var(--text-muted);" onclick="showUserBookingScreen()">← العودة للرئيسية</button>
+        </div>
+
+        <!-- ================= 3. شاشة لوحة التحكم الإدارية الكاملة ================= -->
+        <div id="dashboardScreen" class="dashboard-screen">
+            
+            <div class="dash-header-card">
+                <div class="dash-title">لوحة التحكم والمتابعة</div>
+                <button class="btn-logout" onclick="handleLogout()">خروج</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div id="totalCount" class="stat-val blue">0</div>
+                    <div class="stat-lbl">الكل</div>
+                </div>
+                <div class="stat-card">
+                    <div id="pendingCount" class="stat-val orange">0</div>
+                    <div class="stat-lbl">الانتظار</div>
+                </div>
+                <div class="stat-card">
+                    <div id="successCount" class="stat-val green">0</div>
+                    <div class="stat-lbl">مكتمل</div>
+                </div>
+            </div>
+
+            <!-- لوحة إعدادات الهوية والتعطيل والإقسام -->
+            <div class="config-card">
+                <div style="font-size: 13px; font-weight: bold; border-bottom: 1px dashed var(--input-border); padding-bottom: 5px;">⚙️ الإعدادات العامة للمنصة</div>
+                
+                <div class="config-row">
+                    <span class="config-title">اسم العيادة:</span>
+                    <input type="text" id="cfgClinicName" class="input-short" style="width:140px; text-align:right;" onchange="updateSystemNames()">
+                </div>
+                <div class="config-row">
+                    <span class="config-title">اسم نظام الشركات:</span>
+                    <input type="text" id="cfgCompanyName" class="input-short" style="width:140px; text-align:right;" onchange="updateSystemNames()">
+                </div>
+                <div class="config-row">
+                    <span class="config-title">حد تقديم الشركات الشهري:</span>
+                    <input type="number" id="monthlyLimit" class="input-short" value="4" min="1" onchange="updateMonthlyLimit(this.value)">
+                </div>
+                <div class="config-row">
+                    <span class="config-title">يوم عطلة العيادة:</span>
+                    <select id="cfgClinicHoliday" class="input-short" style="width:140px;" onchange="updateHolidays()">
+                        <option value="">لا يوجد عطلة</option>
+                        <option value="0">الأحد</option>
+                        <option value="1">الأثنين</option>
+                        <option value="2">الثلاثاء</option>
+                        <option value="3">الأربعاء</option>
+                        <option value="4">الخميس</option>
+                        <option value="5">الجمعة</option>
+                        <option value="6">السبت</option>
+                    </select>
+                </div>
+                <div class="config-row">
+                    <span class="config-title">يوم عطلة الشركات:</span>
+                    <select id="cfgCompanyHoliday" class="input-short" style="width:140px;" onchange="updateHolidays()">
+                        <option value="">لا يوجد عطلة</option>
+                        <option value="0">الأحد</option>
+                        <option value="1">الأثنين</option>
+                        <option value="2">الثلاثاء</option>
+                        <option value="3">الأربعاء</option>
+                        <option value="4">الخميس</option>
+                        <option value="5">الجمعة</option>
+                        <option value="6">السبت</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="adminSearchInput" class="form-control" placeholder="🔍 ابحث بالاسم، المندوب، الوصل، أو الشركة..." oninput="handleAdminSearch(this.value)">
+            </div>
+
+            <div class="filter-card">
+                <button id="tabAll" class="tab-btn active" onclick="switchTab('all')">الكل</button>
+                <button id="tabClinics" class="tab-btn" onclick="switchTab('clinic')">العيادات</button>
+                <button id="tabCompanies" class="tab-btn" onclick="switchTab('company')">الشركات</button>
+            </div>
+
+            <div class="section-title">طلبات الحجوزات الحالية</div>
+            <div id="appointmentsList" class="appointments-list"></div>
+
+            <div class="footer-note">نظام حجز المواعيد الذكي الشامل © 2026</div>
+        </div>
+
+    </div>
+
+    <script>
+        // مصفوفة البيانات الافتراضية
+        const defaultAppointments = [
+            { id: 1, type: "clinic", patientName: "أحمد علي حسين", phone: "07701234567", sequence: 1, dateTime: "2026-06-15 10:30", clinicDetail: "عيادة الأسنان", status: "waiting" },
+            { id: 2, type: "company", receiptNo: "REC-1001", companyName: "شركة دجلة", delegateName: "كرار أسعد", amount: "٥٠٠,٠٠٠ د.ع", date: "2026-06-15 14:00", status: "waiting" }
+        ];
+
+        const daysOfWeek = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+
+        let appointments = JSON.parse(localStorage.getItem('appointments')) || defaultAppointments;
+        let globalMonthlyLimit = parseInt(localStorage.getItem('globalMonthlyLimit')) || 4;
+        
+        // إعدادات التسميات والعطل الديناميكية الجديدة
+        let clinicSystemName = localStorage.getItem('clinicSystemName') || "عيادة الشفاء الطبية";
+        let companySystemName = localStorage.getItem('companySystemName') || "شركة دجلة للتوزيع";
+        let clinicHoliday = localStorage.getItem('clinicHoliday') || ""; // خالية تعني لا يوجد عطلة
+        let companyHoliday = localStorage.getItem('companyHoliday') || "";
+
+        let currentFilter = 'all';
+        let adminSearchQuery = '';
+
+        // تطبيق التسميات والإعدادات عند تشغيل التطبيق لأول مرة
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('monthlyLimit').value = globalMonthlyLimit;
+            document.getElementById('cfgClinicName').value = clinicSystemName;
+            document.getElementById('cfgCompanyName').value = companySystemName;
+            document.getElementById('cfgClinicHoliday').value = clinicHoliday;
+            document.getElementById('cfgCompanyHoliday').value = companyHoliday;
+            applySystemBranding();
+        });
+
+        function applySystemBranding() {
+            document.getElementById('userTabClinic').innerText = "حجز " + clinicSystemName;
+            document.getElementById('userTabCompany').innerText = "حجز " + companySystemName;
+            document.getElementById('displaySystemName').innerText = clinicSystemName + " & " + companySystemName;
+            document.getElementById('loginScreenTitle').innerText = "بوابة إدارة " + clinicSystemName;
+        }
+
+        function updateSystemNames() {
+            clinicSystemName = document.getElementById('cfgClinicName').value.trim() || "العيادة";
+            companySystemName = document.getElementById('cfgCompanyName').value.trim() || "الشركة";
+            localStorage.setItem('clinicSystemName', clinicSystemName);
+            localStorage.setItem('companySystemName', companySystemName);
+            applySystemBranding();
+        }
+
+        function updateHolidays() {
+            clinicHoliday = document.getElementById('cfgClinicHoliday').value;
+            companyHoliday = document.getElementById('cfgCompanyHoliday').value;
+            localStorage.setItem('clinicHoliday', clinicHoliday);
+            localStorage.setItem('companyHoliday', companyHoliday);
+        }
+
+        function formatCurrency(input) {
+            let value = input.value.replace(/[^\d]/g, '');
+            if(value) {
+                let formatted = Number(value).toLocaleString('en-US');
+                let arabicNumbers = formatted.replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+                input.value = arabicNumbers + " د.ع";
+            } else {
+                input.value = '';
+            }
+        }
+
+        function switchUserForm(formType) {
+            document.getElementById('userTabClinic').classList.remove('active');
+            document.getElementById('userTabCompany').classList.remove('active');
+            document.getElementById('userTabStatus').classList.remove('active');
+            
+            document.getElementById('formUserClinic').style.display = 'none';
+            document.getElementById('formUserCompany').style.display = 'none';
+            document.getElementById('divUserStatusSearch').style.display = 'none';
+
+            if(formType === 'clinic') {
+                document.getElementById('userTabClinic').classList.add('active');
+                document.getElementById('formUserClinic').style.display = 'block';
+            } else if(formType === 'company') {
+                document.getElementById('userTabCompany').classList.add('active');
+                document.getElementById('formUserCompany').style.display = 'block';
+            } else if(formType === 'status') {
+                document.getElementById('userTabStatus').classList.add('active');
+                document.getElementById('divUserStatusSearch').style.display = 'block';
+                liveCheckStatus();
+            }
+        }
+
+        // فحص العطلات الأسبوعية بناءً على التاريخ المختار
+        function isHolidaySelected(dateString, holidayConfig) {
+            if (!holidayConfig) return false;
+            const chosenDate = new Date(dateString);
+            const dayOfWeek = chosenDate.getDay(); // 0 للأحد، 1 للأثنين... إلخ
+            return dayOfWeek === parseInt(holidayConfig);
+        }
+
+        function submitUserClinic(event) {
+            event.preventDefault();
+            const name = document.getElementById('pName').value.trim();
+            const phone = document.getElementById('pPhone').value.trim();
+            const clinic = document.getElementById('pClinic').value;
+            const datetimeInput = document.getElementById('pDateTime').value;
+
+            if (isHolidaySelected(datetimeInput, clinicHoliday)) {
+                alert(`عذراً، هذا اليوم يصادف يوم عطلة العيادة الأسبوعية (${daysOfWeek[clinicHoliday]}). يرجى اختيار تاريخ آخر.`);
+                return;
+            }
+
+            const datetime = datetimeInput.replace('T', ' ');
+            const currentClinicBookings = appointments.filter(a => a.type === 'clinic' && a.clinicDetail === clinic);
+            const nextSequence = currentClinicBookings.length + 1;
+            const newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 1;
+            
+            const newBooking = {
+                id: newId,
+                type: "clinic",
+                patientName: name,
+                phone: phone,
+                sequence: nextSequence,
+                dateTime: datetime,
+                clinicDetail: clinic,
+                status: "waiting"
+            };
+
+            appointments.push(newBooking);
+            saveData();
+
+            const msg = `*طلب حجز عيادة جديد*%0A-------------------------%0A• *اسم المريض:* ${name}%0A• *رقم الهاتف:* ${phone}%0A• *العيادة:* ${clinic}%0A• *الموعد:* ${datetime}%0A• *رقم التسلسل:* # ${nextSequence}%0A-------------------------`;
+            window.open(`https://wa.me/?text=${msg}`, '_blank');
+            alert(`تم تسجيل حجزك بنجاح وتسلسلك هو: (# ${nextSequence}).`);
+            document.getElementById('formUserClinic').reset();
+        }
+
+        function submitUserCompany(event) {
+            event.preventDefault();
+            const company = document.getElementById('cName').value.trim();
+            const delegate = document.getElementById('cDelegate').value.trim();
+            const amount = document.getElementById('cAmount').value.trim();
+            const dateInput = document.getElementById('cDate').value;
+
+            if (isHolidaySelected(dateInput, companyHoliday)) {
+                alert(`عذراً، هذا اليوم يصادف يوم عطلة الشركات الأسبوعية (${daysOfWeek[companyHoliday]}). يرجى اختيار تاريخ آخر.`);
+                return;
+            }
+
+            const date = dateInput.replace('T', ' ');
+            const companyBookingsCount = appointments.filter(a => a.type === 'company' && a.companyName.toLowerCase() === company.toLowerCase()).length;
+
+            if (companyBookingsCount >= globalMonthlyLimit) {
+                alert(`عذراً! تجاوزت شركة (${company}) حد التقديم الشهري المسموح به وهو (${globalMonthlyLimit}) مرات.`);
+                return;
+            }
+
+            const newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 1;
+            const nextReceiptNo = "REC-" + (1000 + newId);
+
+            const newBooking = {
+                id: newId,
+                type: "company",
+                receiptNo: nextReceiptNo,
+                companyName: company,
+                delegateName: delegate,
+                amount: amount,
+                date: date,
+                status: "waiting"
+            };
+
+            appointments.push(newBooking);
+            saveData();
+
+            const msg = `*طلب استحصال كارتات شركات*%0A-------------------------%0A• *رقم الوصل الفريد:* ${nextReceiptNo}%0A• *اسم الشركة:* ${company}%0A• *اسم المندوب:* ${delegate}%0A• *المبلغ المراد استحصاله:* ${amount}%0A• *التاريخ والوقت المطلوب:* ${date}%0A-------------------------`;
+            window.open(`https://wa.me/?text=${msg}`, '_blank');
+            alert(`تم إرسال طلب شركة بنجاح! رقم الوصل: (${nextReceiptNo}).`);
+            document.getElementById('formUserCompany').reset();
+        }
+
+        function liveCheckStatus() {
+            const queryInput = document.getElementById('searchStatusPhone').value.trim().toLowerCase();
+            const container = document.getElementById('statusResultContainer');
+            container.innerHTML = '';
+
+            if(!queryInput) {
+                container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:12px; padding:10px;">يرجى إدخال أي تفاصيل لبدء الاستعلام الفوري</div>`;
+                return;
+            }
+
+            const matches = appointments.filter(a => {
+                if(a.type === 'clinic') {
+                    return a.patientName.toLowerCase().includes(queryInput) || a.phone.includes(queryInput);
+                } else {
+                    return a.companyName.toLowerCase().includes(queryInput) || a.delegateName.toLowerCase().includes(queryInput) || (a.receiptNo && a.receiptNo.toLowerCase().includes(queryInput));
+                }
+            });
+
+            if(matches.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:var(--error-color); font-size:12px; padding:15px; background:#fff5f5; border-radius:8px; border:1px solid #fed7d7;">لم نجد أي حجز مرتبط بهذا المدخل حالياً</div>`;
+                return;
+            }
+
+            matches.forEach(app => {
+                let statusText = 'قيد الانتظار 🟠';
+                let statusColor = 'var(--warning-color)';
+                if(app.status === 'confirmed') { statusText = 'تم تأكيد الحجز بنجاح 🟢'; statusColor = 'var(--success-color)'; }
+                if(app.status === 'postponed') { statusText = `مؤجل إلى: (${app.date || app.dateTime}) 🔵`; statusColor = 'var(--primary-color)'; }
+                if(app.status === 'rejected') { statusText = `نعتذر، تم رفض الحجز لسبب: (${app.rejectReason || 'غير محدد'}) 🔴`; statusColor = 'var(--error-color)'; }
+
+                let html = `
+                    <div style="background:#f8fafc; border:1px solid var(--input-border); border-right:4px solid ${statusColor}; padding:10px; border-radius:8px; font-size:12px;">
+                        <div style="font-weight:700; margin-bottom:4px;">${app.type === 'clinic' ? '🏥 حجز العيادة' : '🏢 حجز الشركة'}</div>
+                        ${app.receiptNo ? `<div>• *رقم الوصل:* <span style="font-weight:700; color:var(--primary-color);">${app.receiptNo}</span></div>` : ''}
+                        <div>• *الاسم/الجهة:* ${app.type === 'clinic' ? app.patientName : app.companyName}</div>
+                        <div>• *الموعد المطلوب:* <span style="color:var(--primary-color); font-weight:700;">${app.type === 'clinic' ? app.dateTime : app.date}</span></div>
+                        <div style="margin-top:5px; font-weight:700; color:${statusColor};">الحالة الحالية: ${statusText}</div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function saveData() {
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+            localStorage.setItem('globalMonthlyLimit', globalMonthlyLimit.toString());
+        }
+
+        function handleAdminSearch(query) {
+            adminSearchQuery = query.toLowerCase().trim();
+            renderDashboard();
+        }
+
+        function showLoginScreen() {
+            document.getElementById('userBookingScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'block';
+        }
+
+        function showUserBookingScreen() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('userBookingScreen').style.display = 'block';
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            const errorDiv = document.getElementById('errorMessage');
+
+            errorDiv.style.display = 'none';
+
+            if (email.toLowerCase() === "manasa.iraq2026@gmail.com" && password === "19001800") {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboardScreen').style.display = 'block';
+                renderDashboard();
+            } else {
+                errorDiv.innerText = "البريد الإلكتروني أو كلمة المرور غير صحيحة!";
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById('dashboardScreen').style.display = 'none';
+            document.getElementById('userBookingScreen').style.display = 'block';
+            document.getElementById('loginForm').reset();
+            document.getElementById('adminSearchInput').value = '';
+            adminSearchQuery = '';
+        }
+
+        function updateMonthlyLimit(val) {
+            globalMonthlyLimit = parseInt(val) || 4;
+            saveData();
+        }
+
+        function renderDashboard() {
+            const total = appointments.length;
+            const pending = appointments.filter(a => a.status === 'waiting').length;
+            const success = appointments.filter(a => a.status === 'confirmed').length;
+
+            document.getElementById('totalCount').innerText = total;
+            document.getElementById('pendingCount').innerText = pending;
+            document.getElementById('successCount').innerText = success;
+
+            const listContainer = document.getElementById('appointmentsList');
+            listContainer.innerHTML = '';
+
+            let filtered = appointments.filter(a => currentFilter === 'all' || a.type === currentFilter);
+
+            if (adminSearchQuery !== '') {
+                filtered = filtered.filter(a => {
+                    if (a.type === 'clinic') {
+                        return a.patientName.toLowerCase().includes(adminSearchQuery) || a.phone.includes(adminSearchQuery);
+                    } else {
+                        return a.companyName.toLowerCase().includes(adminSearchQuery) || a.delegateName.toLowerCase().includes(adminSearchQuery) || (a.receiptNo && a.receiptNo.toLowerCase().includes(adminSearchQuery));
+                    }
+                });
+            }
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:30px; font-size:13px; background:var(--card-bg); border-radius:12px; border:1px solid var(--input-border);">لا توجد حجوزات تطابق البحث</div>`;
+                return;
+            }
+
+            filtered.forEach(app => {
+                let statusBadge = '';
+                if(app.status === 'waiting') statusBadge = '<span class="badge waiting">قيد الانتظار</span>';
+                if(app.status === 'confirmed') statusBadge = '<span class="badge confirmed">مؤكد</span>';
+                if(app.status === 'postponed') statusBadge = '<span class="badge postponed">مؤجل</span>';
+                if(app.status === 'rejected') statusBadge = '<span class="badge rejected">مرفوض</span>';
+                
+                let cardContent = '';
+
+                if (app.type === 'clinic') {
+                    cardContent = `
+                        <div class="appointment-card status-${app.status}">
+                            <div class="card-row">
+                                <div class="main-title">المريض: ${app.patientName}</div>
+                                ${statusBadge}
+                            </div>
+                            <div class="details-grid">
+                                <div class="detail-item"><span class="detail-label">الهاتف:</span><span class="detail-value">${app.phone}</span></div>
+                                <div class="detail-item"><span class="detail-label">العيادة:</span><span class="detail-value">${app.clinicDetail}</span></div>
+                                <div class="detail-item"><span class="detail-label">التاريخ والوقت:</span><span class="detail-value" style="color:var(--primary-color); font-weight:700;">${app.dateTime}</span></div>
+                            </div>
+
+                            <div id="postponeBox-${app.id}" class="postpone-box">
+                                <label style="font-size:11px; font-weight:700;">اختر موعد التأجيل الجديد بالوقت:</label>
+                                <input type="datetime-local" id="newDateTime-${app.id}">
+                                <button class="btn-action btn-confirm" style="padding:6px; font-size:11px;" onclick="submitPostpone(${app.id}, 'clinic')">تأكيد الموعد الجديد</button>
+                            </div>
+
+                            <div class="card-actions">
+                                <button class="btn-action btn-confirm" onclick="triggerAction(${app.id}, 'confirmed', 'تم قبول حجز العيادة الخاص بك بنجاح!')">قبول</button>
+                                <button class="btn-action btn-postpone" onclick="togglePostponeBox(${app.id})">تأجيل</button>
+                                <button class="btn-action btn-delete" onclick="deleteAppointment(${app.id})">حذف</button>
+                            </div>
+                        </div>
+                    `;
+                } else if (app.type === 'company') {
+                    cardContent = `
+                        <div class="appointment-card status-${app.status}">
+                            <div class="card-row">
+                                <div class="main-title">${app.companyName} [${app.receiptNo || 'وصل'}]</div>
+                                ${statusBadge}
+                            </div>
+                            <div class="details-grid">
+                                <div class="detail-item"><span class="detail-label">المندوب:</span><span class="detail-value">${app.delegateName}</span></div>
+                                <div class="detail-item"><span class="detail-label">مبلغ الاستحصال:</span><span class="detail-value" style="color:var(--success-color); font-weight:700;">${app.amount}</span></div>
+                                <div class="detail-item"><span class="detail-label">التاريخ والوقت:</span><span class="detail-value" style="color:var(--primary-color); font-weight:700;">${app.date}</span></div>
+                            </div>
+
+                            <div id="postponeBox-${app.id}" class="postpone-box">
+                                <label style="font-size:11px; font-weight:700;">اختر التاريخ والوقت الجديد للشركة:</label>
+                                <input type="datetime-local" id="newDateTime-${app.id}">
+                                <button class="btn-action btn-confirm" style="padding:6px; font-size:11px;" onclick="submitPostpone(${app.id}, 'company')">تأكيد التأجيل الجديد</button>
+                            </div>
+
+                            <div id="rejectBox-${app.id}" class="reject-box">
+                                <label style="font-size:11px; font-weight:700; color:var(--error-color);">اكتب سبب الرفض:</label>
+                                <input type="text" id="rejectReasonInput-${app.id}" placeholder="مثال: تجاوز السقف المالي أو نقص مستندات">
+                                <button class="btn-action btn-reject" style="padding:6px; font-size:11px;" onclick="submitReject(${app.id})">إرسال سبب الرفض</button>
+                            </div>
+
+                            <div class="card-actions">
+                                <button class="btn-action btn-confirm" onclick="triggerAction(${app.id}, 'confirmed', 'تمت الموافقة وتأكيد حجز كارتات شركتكم بنجاح!')">قبول</button>
+                                <button class="btn-action btn-postpone" onclick="togglePostponeBox(${app.id})">تأجيل</button>
+                                <button class="btn-action btn-reject" onclick="toggleRejectBox(${app.id})">رفض</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                listContainer.innerHTML += cardContent;
+            });
+        }
+
+        function togglePostponeBox(id) {
+            const box = document.getElementById(`postponeBox-${id}`);
+            box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function toggleRejectBox(id) {
+            const box = document.getElementById(`rejectBox-${id}`);
+            box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function triggerAction(id, status, notifyText) {
+            appointments = appointments.map(app => app.id === id ? { ...app, status: status } : app);
+            saveData();
+            renderDashboard();
+
+            const target = appointments.find(app => app.id === id);
+            const msg = `*إشعار من الإدارة*%0A-------------------------%0A• *الحالة:* ${notifyText}%0A• *الجهة/الاسم:* ${target.type === 'clinic' ? target.patientName : target.companyName}%0A-------------------------`;
+            window.open(`https://wa.me/?text=${msg}`, '_blank');
+        }
+
+        function submitPostpone(id, type) {
+            const inputVal = document.getElementById(`newDateTime-${id}`).value;
+            if(!inputVal) {
+                alert("يرجى اختيار التاريخ والوقت الجديد أولاً!");
+                return;
+            }
+
+            // فحص عطلة اليوم المختار للتأجيل أيضاً
+            const activeHoliday = (type === 'clinic') ? clinicHoliday : companyHoliday;
+            if (isHolidaySelected(inputVal, activeHoliday)) {
+                alert(`لا يمكن التأجيل لهذا اليوم لأنه يصادف يوم العطلة الأسبوعية المعتمد (${daysOfWeek[activeHoliday]})!`);
+                return;
+            }
+            
+            const formattedDate = inputVal.replace('T', ' ');
+            
+            appointments = appointments.map(app => {
+                if(app.id === id) {
+                    if(type === 'clinic') return { ...app, dateTime: formattedDate, status: 'postponed' };
+                    return { ...app, date: formattedDate, status: 'postponed' };
+                }
+                return app;
+            });
+
+            saveData();
+            renderDashboard();
+
+            const target = appointments.find(app => app.id === id);
+            const msg = `*إشعار تأجيل موعد الحجز*%0A-------------------------%0A• *الجهة:* ${target.type === 'clinic' ? target.patientName : target.companyName}%0A• *الموعد الجديد المعتمد:* ${formattedDate}%0A-------------------------`;
+            window.open(`https://wa.me/?text=${msg}`, '_blank');
+            alert("تم التأجيل بنجاح!");
+        }
+
+        function submitReject(id) {
+            const reason = document.getElementById(`rejectReasonInput-${id}`).value.trim() || "لم يذكر سبب محدد";
+            appointments = appointments.map(app => app.id === id ? { ...app, status: 'rejected', rejectReason: reason } : app);
+            saveData();
+            renderDashboard();
+
+            const target = appointments.find(app => app.id === id);
+            const msg = `*إشعار رفض طلب الحجز 🔴*%0A-------------------------%0A• *الجهة/الشركة:* ${target.companyName}%0A• *سبب الرفض الصادر:* ${reason}%0A-------------------------`;
+            window.open(`https://wa.me/?text=${msg}`, '_blank');
+            alert("تم رفض الطلب.");
+        }
+
+        function switchTab(tabType) {
+            currentFilter = tabType;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if(tabType === 'all') document.getElementById('tabAll').classList.add('active');
+            if(tabType === 'clinic') document.getElementById('tabClinics').classList.add('active');
+            if(tabType === 'company') document.getElementById('tabCompanies').classList.add('active');
+
+            renderDashboard();
+        }
+
+        function deleteAppointment(id) {
+            if(confirm("هل أنت متأكد من حذف الحجز نهائياً؟")) {
+                appointments = appointments.filter(app => app.id !== id);
+                saveData();
+                renderDashboard();
+            }
+        }
+    </script>
+</body>
+</html>
