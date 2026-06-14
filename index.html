@@ -589,23 +589,23 @@
                 
                 <div class="config-row">
                     <span class="config-title">رقم هاتف مدير التطبيق:</span>
-                    <input type="tel" id="cfgAdminPhone" class="input-short" style="width:140px; text-align:left;" placeholder="9647xxxxxxxx" onchange="updateSettingsOnFirebase()">
+                    <input type="tel" id="cfgAdminPhone" class="input-short" style="width:140px; text-align:left;" placeholder="9647xxxxxxxx" onchange="updateSettingsOnSupabase()">
                 </div>
                 <div class="config-row">
                     <span class="config-title">اسم العيادة:</span>
-                    <input type="text" id="cfgClinicName" class="input-short" style="width:140px; text-align:right;" onchange="updateSettingsOnFirebase()">
+                    <input type="text" id="cfgClinicName" class="input-short" style="width:140px; text-align:right;" onchange="updateSettingsOnSupabase()">
                 </div>
                 <div class="config-row">
                     <span class="config-title">اسم نظام الشركات:</span>
-                    <input type="text" id="cfgCompanyName" class="input-short" style="width:140px; text-align:right;" onchange="updateSettingsOnFirebase()">
+                    <input type="text" id="cfgCompanyName" class="input-short" style="width:140px; text-align:right;" onchange="updateSettingsOnSupabase()">
                 </div>
                 <div class="config-row">
                     <span class="config-title">حد تقديم الشركات الشهري:</span>
-                    <input type="number" id="monthlyLimit" class="input-short" value="4" min="1" onchange="updateSettingsOnFirebase()">
+                    <input type="number" id="monthlyLimit" class="input-short" value="4" min="1" onchange="updateSettingsOnSupabase()">
                 </div>
                 <div class="config-row">
                     <span class="config-title">يوم عطلة العيادة:</span>
-                    <select id="cfgClinicHoliday" class="input-short" style="width:140px;" onchange="updateSettingsOnFirebase()">
+                    <select id="cfgClinicHoliday" class="input-short" style="width:140px;" onchange="updateSettingsOnSupabase()">
                         <option value="">لا يوجد عطلة</option>
                         <option value="0">الأحد</option>
                         <option value="1">الأثنين</option>
@@ -618,7 +618,7 @@
                 </div>
                 <div class="config-row">
                     <span class="config-title">يوم عطلة الشركات:</span>
-                    <select id="cfgCompanyHoliday" class="input-short" style="width:140px;" onchange="updateSettingsOnFirebase()">
+                    <select id="cfgCompanyHoliday" class="input-short" style="width:140px;" onchange="updateSettingsOnSupabase()">
                         <option value="">لا يوجد عطلة</option>
                         <option value="0">الأحد</option>
                         <option value="1">الأثنين</option>
@@ -649,26 +649,16 @@
 
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        // ⚠️ ضَع إعدادات حساب الـ Firebase الخاص بك هنا ⚠️
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+    <script>
+        // إعدادات الربط المباشر مع سيرفر Supabase الخاص بك
+        const SUPABASE_URL = "https://wsxelzmddipdjwfeylpd.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_WKH0Y3zTu8vXQp9myVJVfQ_u6wIMrLL";
 
-        // تهيئة السيرفر
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
+        // تهيئة عميل الاتصال بالسيرفر
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // متغيرات النظام العامة المزامنة مع السيرفر
         let appointments = [];
         const daysOfWeek = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
         
@@ -684,27 +674,45 @@
         let currentFilter = 'all';
         let adminSearchQuery = '';
 
-        // أولاً: الاستماع لمتغيرات الإعدادات من السيرفر بشكل حي وثابت
-        onValue(ref(database, 'settings'), (snapshot) => {
-            if(snapshot.exists()) {
-                configSystem = snapshot.val();
-            }
-            applySystemBranding();
-            updateConfigFieldsUI();
+        // تشغيل التثبيت والبدء عند تحميل الصفحة بالكامل
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchSettings();
+            fetchAppointments();
+            
+            // الاستماع اللحظي للتحديثات في جدول الحجوزات لضمان عدم الحذف أو التغيير دون مزامنة الحساب
+            supabase
+                .channel('schema-db-changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => {
+                    fetchAppointments();
+                })
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'settings' }, () => {
+                    fetchSettings();
+                })
+                .subscribe();
         });
 
-        // ثانياً: الاستماع لجدول الحجوزات بشكل حي وتحديث لوحة التحكم فوراً عند أي تغيير
-        onValue(ref(database, 'appointments'), (snapshot) => {
-            appointments = [];
-            if(snapshot.exists()) {
-                const data = snapshot.val();
-                for(let id in data) {
-                    appointments.push({ firebaseId: id, ...data[id] });
-                }
+        // جلب الإعدادات العامة من السيرفر
+        async function fetchSettings() {
+            const { data, error } = await supabase.from('settings').select('*');
+            if (!error && data && data.length > 0) {
+                configSystem = data[0];
+                applySystemBranding();
+                updateConfigFieldsUI();
+            } else if (data && data.length === 0) {
+                // إذا كان الجدول فارغاً نقوم بإنشاء سجل إعدادات افتراضي أول مرة
+                await supabase.from('settings').insert([configSystem]);
             }
-            renderDashboard();
-            liveCheckStatus();
-        });
+        }
+
+        // جلب الحجوزات بالكامل وبشكل حي
+        async function fetchAppointments() {
+            const { data, error } = await supabase.from('appointments').select('*').order('id', { ascending: false });
+            if (!error && data) {
+                appointments = data;
+                renderDashboard();
+                liveCheckStatus();
+            }
+        }
 
         function applySystemBranding() {
             document.getElementById('userTabClinic').innerText = "حجز " + (configSystem.clinicSystemName || "العيادة");
@@ -717,22 +725,29 @@
             document.getElementById('monthlyLimit').value = configSystem.globalMonthlyLimit || 4;
             document.getElementById('cfgClinicName').value = configSystem.clinicSystemName || "";
             document.getElementById('cfgCompanyName').value = configSystem.companySystemName || "";
-            document.getElementById('cfgClinicHoliday').value = configSystem.clinicHoliday || "";
-            document.getElementById('cfgCompanyHoliday').value = configSystem.companyHoliday || "";
+            document.getElementById('cfgClinicHoliday').value = configSystem.clinicHoliday !== null ? configSystem.clinicHoliday : "";
+            document.getElementById('cfgCompanyHoliday').value = configSystem.companyHoliday !== null ? configSystem.companyHoliday : "";
             document.getElementById('cfgAdminPhone').value = configSystem.adminPhone || "";
         }
 
-        // حفظ التغييرات في الإعدادات إلى السيرفر
-        window.updateSettingsOnFirebase = function() {
+        // حفظ التغييرات وتحديثها مباشرة على السيرفر (Supabase)
+        window.updateSettingsOnSupabase = async function() {
             const updatedConfig = {
                 clinicSystemName: document.getElementById('cfgClinicName').value.trim() || "العيادة",
                 companySystemName: document.getElementById('cfgCompanyName').value.trim() || "الشركة",
                 globalMonthlyLimit: parseInt(document.getElementById('monthlyLimit').value) || 4,
-                clinicHoliday: document.getElementById('cfgClinicHoliday').value,
-                companyHoliday: document.getElementById('cfgCompanyHoliday').value,
+                clinicHoliday: document.getElementById('cfgClinicHoliday').value !== "" ? parseInt(document.getElementById('cfgClinicHoliday').value) : null,
+                companyHoliday: document.getElementById('cfgCompanyHoliday').value !== "" ? parseInt(document.getElementById('cfgCompanyHoliday').value) : null,
                 adminPhone: document.getElementById('cfgAdminPhone').value.trim()
             };
-            set(ref(database, 'settings'), updatedConfig);
+
+            const { data } = await supabase.from('settings').select('id');
+            if (data && data.length > 0) {
+                await supabase.from('settings').update(updatedConfig).eq('id', data[0].id);
+            } else {
+                await supabase.from('settings').insert([updatedConfig]);
+            }
+            fetchSettings();
         };
 
         function sendWhatsAppMessage(text) {
@@ -744,13 +759,13 @@
         }
 
         function isHolidaySelected(dateString, holidayConfig) {
-            if (!holidayConfig) return false;
+            if (holidayConfig === null || holidayConfig === "") return false;
             const chosenDate = new Date(dateString);
             return chosenDate.getDay() === parseInt(holidayConfig);
         }
 
-        // معالجة إرسال حجز العيادة إلى الـ Firebase والواتساب
-        window.submitUserClinic = function(event) {
+        // إرسال حجز العيادة وحفظه بجدول السيرفر الثابت
+        window.submitUserClinic = async function(event) {
             event.preventDefault();
             const name = document.getElementById('pName').value.trim();
             const phone = document.getElementById('pPhone').value.trim();
@@ -765,10 +780,8 @@
             const datetime = datetimeInput.replace('T', ' ');
             const currentClinicBookings = appointments.filter(a => a.type === 'clinic' && a.clinicDetail === clinic);
             const nextSequence = currentClinicBookings.length + 1;
-            const newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id || 0)) + 1 : 1;
             
             const newBooking = {
-                id: newId,
                 type: "clinic",
                 patientName: name,
                 phone: phone,
@@ -778,16 +791,18 @@
                 status: "waiting"
             };
 
-            push(ref(database, 'appointments'), newBooking).then(() => {
+            const { error } = await supabase.from('appointments').insert([newBooking]);
+            if (!error) {
                 const msg = `*طلب حجز عيادة جديد*%0A-------------------------%0A• *اسم المريض:* ${name}%0A• *رقم الهاتف:* ${phone}%0A• *العيادة:* ${clinic}%0A• *الموعد:* ${datetime}%0A• *رقم التسلسل:* # ${nextSequence}%0A-------------------------`;
                 sendWhatsAppMessage(msg);
                 alert(`تم تسجيل حجزك بنجاح وتسلسلك هو: (# ${nextSequence}).`);
                 document.getElementById('formUserClinic').reset();
-            });
+                fetchAppointments();
+            }
         };
 
-        // معالجة إرسال طلبات الشركات مع قيود السيرفر الديناميكية
-        window.submitUserCompany = function(event) {
+        // إرسال حجز الشركة وحفظه بجدول السيرفر الثابت
+        window.submitUserCompany = async function(event) {
             event.preventDefault();
             const company = document.getElementById('cName').value.trim();
             const delegate = document.getElementById('cDelegate').value.trim();
@@ -800,18 +815,17 @@
             }
 
             const date = dateInput.replace('T', ' ');
-            const companyBookingsCount = appointments.filter(a => a.type === 'company' && a.companyName.toLowerCase() === company.toLowerCase()).length;
+            const companyBookingsCount = appointments.filter(a => a.type === 'company' && a.companyName && a.companyName.toLowerCase() === company.toLowerCase()).length;
 
             if (companyBookingsCount >= configSystem.globalMonthlyLimit) {
                 alert(`عذراً! تجاوزت شركة (${company}) حد التقديم الشهري المسموح به وهو (${configSystem.globalMonthlyLimit}) مرات.`);
                 return;
             }
 
-            const newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id || 0)) + 1 : 1;
-            const nextReceiptNo = "REC-" + (1000 + newId);
+            const nextId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id || 0)) + 1 : 1;
+            const nextReceiptNo = "REC-" + (1000 + nextId);
 
             const newBooking = {
-                id: newId,
                 type: "company",
                 receiptNo: nextReceiptNo,
                 companyName: company,
@@ -821,15 +835,17 @@
                 status: "waiting"
             };
 
-            push(ref(database, 'appointments'), newBooking).then(() => {
+            const { error } = await supabase.from('appointments').insert([newBooking]);
+            if (!error) {
                 const msg = `*طلب استحصال كارتات شركات*%0A-------------------------%0A• *رقم الوصل الفريد:* ${nextReceiptNo}%0A• *اسم الشركة:* ${company}%0A• *اسم المندوب:* ${delegate}%0A• *المبلغ المراد استحصاله:* ${amount}%0A• *التاريخ والوقت المطلوب:* ${date}%0A-------------------------`;
                 sendWhatsAppMessage(msg);
                 alert(`تم إرسال طلب شركة بنجاح! رقم الوصل: (${nextReceiptNo}).`);
                 document.getElementById('formUserCompany').reset();
-            });
+                fetchAppointments();
+            }
         };
 
-        // واجهة استعلام المراجعين الفوري المربوط بالسيرفر الموحد
+        // البحث والاستعلام للمستخدم من السيرفر المباشر
         window.liveCheckStatus = function() {
             const queryInput = document.getElementById('searchStatusPhone').value.trim().toLowerCase();
             const container = document.getElementById('statusResultContainer');
@@ -843,9 +859,9 @@
 
             const matches = appointments.filter(a => {
                 if(a.type === 'clinic') {
-                    return a.patientName.toLowerCase().includes(queryInput) || a.phone.includes(queryInput);
+                    return (a.patientName && a.patientName.toLowerCase().includes(queryInput)) || (a.phone && a.phone.includes(queryInput));
                 } else {
-                    return a.companyName.toLowerCase().includes(queryInput) || a.delegateName.toLowerCase().includes(queryInput) || (a.receiptNo && a.receiptNo.toLowerCase().includes(queryInput));
+                    return (a.companyName && a.companyName.toLowerCase().includes(queryInput)) || (a.delegateName && a.delegateName.toLowerCase().includes(queryInput)) || (a.receiptNo && a.receiptNo.toLowerCase().includes(queryInput));
                 }
             });
 
@@ -879,16 +895,18 @@
             renderDashboard();
         };
 
-        window.triggerAction = function(firebaseId, status, notifyText) {
-            update(ref(database, `appointments/${firebaseId}`), { status: status }).then(() => {
-                const target = appointments.find(app => app.firebaseId === firebaseId);
+        window.triggerAction = async function(id, status, notifyText) {
+            const { error } = await supabase.from('appointments').update({ status: status }).eq('id', id);
+            if (!error) {
+                const target = appointments.find(app => app.id === id);
                 const msg = `*إشعار من الإدارة*%0A-------------------------%0A• *الحالة:* ${notifyText}%0A• *الجهة/الاسم:* ${target.type === 'clinic' ? target.patientName : target.companyName}%0A-------------------------`;
                 sendWhatsAppMessage(msg);
-            });
+                fetchAppointments();
+            }
         };
 
-        window.submitPostpone = function(firebaseId, type) {
-            const inputVal = document.getElementById(`newDateTime-${firebaseId}`).value;
+        window.submitPostpone = async function(id, type) {
+            const inputVal = document.getElementById(`newDateTime-${id}`).value;
             if(!inputVal) {
                 alert("يرجى اختيار التاريخ والوقت الجديد أولاً!");
                 return;
@@ -905,27 +923,34 @@
             if(type === 'clinic') updates.dateTime = formattedDate;
             else updates.date = formattedDate;
 
-            update(ref(database, `appointments/${firebaseId}`), updates).then(() => {
-                const target = appointments.find(app => app.firebaseId === firebaseId);
+            const { error } = await supabase.from('appointments').update(updates).eq('id', id);
+            if (!error) {
+                const target = appointments.find(app => app.id === id);
                 const msg = `*إشعار تأجيل موعد الحجز*%0A-------------------------%0A• *الجهة:* ${target.type === 'clinic' ? target.patientName : target.companyName}%0A• *الموعد الجديد المعتمد:* ${formattedDate}%0A-------------------------`;
                 sendWhatsAppMessage(msg);
                 alert("تم تحديث الموعد وتأجيل الطلب بنجاح!");
-            });
+                fetchAppointments();
+            }
         };
 
-        window.submitReject = function(firebaseId) {
-            const reason = document.getElementById(`rejectReasonInput-${firebaseId}`).value.trim() || "لم يذكر سبب محدد";
-            update(ref(database, `appointments/${firebaseId}`), { status: 'rejected', rejectReason: reason }).then(() => {
-                const target = appointments.find(app => app.firebaseId === firebaseId);
+        window.submitReject = async function(id) {
+            const reason = document.getElementById(`rejectReasonInput-${id}`).value.trim() || "لم يذكر سبب محدد";
+            const { error } = await supabase.from('appointments').update({ status: 'rejected', rejectReason: reason }).eq('id', id);
+            if (!error) {
+                const target = appointments.find(app => app.id === id);
                 const msg = `*إشعار رفض طلب الحجز 🔴*%0A-------------------------%0A• *الجهة/الشركة:* ${target.companyName}%0A• *سبب الرفض الصادر:* ${reason}%0A-------------------------`;
                 sendWhatsAppMessage(msg);
                 alert("تم رفض الطلب بنجاح.");
-            });
+                fetchAppointments();
+            }
         };
 
-        window.deleteAppointment = function(firebaseId) {
+        window.deleteAppointment = async function(id) {
             if(confirm("هل أنت متأكد من حذف الحجز نهائياً من السيرفر السحابي؟")) {
-                remove(ref(database, `appointments/${firebaseId}`));
+                const { error } = await supabase.from('appointments').delete().eq('id', id);
+                if (!error) {
+                    fetchAppointments();
+                }
             }
         };
 
@@ -960,9 +985,9 @@
             if (adminSearchQuery !== '') {
                 filtered = filtered.filter(a => {
                     if (a.type === 'clinic') {
-                        return a.patientName.toLowerCase().includes(adminSearchQuery) || a.phone.includes(adminSearchQuery);
+                        return (a.patientName && a.patientName.toLowerCase().includes(adminSearchQuery)) || (a.phone && a.phone.includes(adminSearchQuery));
                     } else {
-                        return a.companyName.toLowerCase().includes(adminSearchQuery) || a.delegateName.toLowerCase().includes(adminSearchQuery) || (a.receiptNo && a.receiptNo.toLowerCase().includes(adminSearchQuery));
+                        return (a.companyName && a.companyName.toLowerCase().includes(adminSearchQuery)) || (a.delegateName && a.delegateName.toLowerCase().includes(adminSearchQuery)) || (a.receiptNo && a.receiptNo.toLowerCase().includes(adminSearchQuery));
                     }
                 });
             }
@@ -993,15 +1018,15 @@
                                 <div class="detail-item"><span class="detail-label">العيادة:</span><span class="detail-value">${app.clinicDetail}</span></div>
                                 <div class="detail-item"><span class="detail-label">التاريخ والوقت:</span><span class="detail-value" style="color:var(--primary-color); font-weight:700;">${app.dateTime}</span></div>
                             </div>
-                            <div id="postponeBox-${app.firebaseId}" class="postpone-box">
+                            <div id="postponeBox-${app.id}" class="postpone-box">
                                 <label style="font-size:11px; font-weight:700;">اختر موعد التأجيل الجديد بالوقت:</label>
-                                <input type="datetime-local" id="newDateTime-${app.firebaseId}">
-                                <button class="btn-action btn-confirm" style="padding:6px; font-size:11px;" onclick="submitPostpone('${app.firebaseId}', 'clinic')">تأكيد الموعد الجديد</button>
+                                <input type="datetime-local" id="newDateTime-${app.id}">
+                                <button class="btn-action btn-confirm" style="padding:6px; font-size:11px;" onclick="submitPostpone('${app.id}', 'clinic')">تأكيد الموعد الجديد</button>
                             </div>
                             <div class="card-actions">
-                                <button class="btn-action btn-confirm" onclick="triggerAction('${app.firebaseId}', 'confirmed', 'تم قبول حجز العيادة الخاص بك بنجاح!')">قبول</button>
-                                <button class="btn-action btn-postpone" onclick="togglePostponeBox('${app.firebaseId}')">تأجيل</button>
-                                <button class="btn-action btn-delete" onclick="deleteAppointment('${app.firebaseId}')">حذف</button>
+                                <button class="btn-action btn-confirm" onclick="triggerAction('${app.id}', 'confirmed', 'تم قبول حجز العيادة الخاص بك بنجاح!')">قبول</button>
+                                <button class="btn-action btn-postpone" onclick="togglePostponeBox('${app.id}')">تأجيل</button>
+                                <button class="btn-action btn-delete" onclick="deleteAppointment('${app.id}')">حذف</button>
                             </div>
                         </div>
                     `;
@@ -1017,20 +1042,20 @@
                                 <div class="detail-item"><span class="detail-label">مبلغ الاستحصال:</span><span class="detail-value" style="color:var(--success-color); font-weight:700;">${app.amount}</span></div>
                                 <div class="detail-item"><span class="detail-label">التاريخ والوقت:</span><span class="detail-value" style="color:var(--primary-color); font-weight:700;">${app.date}</span></div>
                             </div>
-                            <div id="postponeBox-${app.firebaseId}" class="postpone-box">
+                            <div id="postponeBox-${app.id}" class="postpone-box">
                                 <label style="font-size:11px; font-weight:700;">اختر التاريخ والوقت الجديد للشركة:</label>
-                                <input type="datetime-local" id="newDateTime-${app.firebaseId}">
-                                <button class="btn-action btn-confirm" style="padding:6px; font-size:11px;" onclick="submitPostpone('${app.firebaseId}', 'company')">تأكيد التأجيل الجديد</button>
+                                <input type="datetime-local" id="newDateTime-${app.id}">
+                                <button class="btn-action btn-confirm" style="padding:6px; font-size:11px;" onclick="submitPostpone('${app.id}', 'company')">تأكيد التأجيل الجديد</button>
                             </div>
-                            <div id="rejectBox-${app.firebaseId}" class="reject-box">
+                            <div id="rejectBox-${app.id}" class="reject-box">
                                 <label style="font-size:11px; font-weight:700; color:var(--error-color);">اكتب سبب الرفض:</label>
-                                <input type="text" id="rejectReasonInput-${app.firebaseId}" placeholder="مثال: تجاوز السقف المالي">
-                                <button class="btn-action btn-reject" style="padding:6px; font-size:11px;" onclick="submitReject('${app.firebaseId}')">إرسال سبب الرفض</button>
+                                <input type="text" id="rejectReasonInput-${app.id}" placeholder="مثال: تجاوز السقف المالي">
+                                <button class="btn-action btn-reject" style="padding:6px; font-size:11px;" onclick="submitReject('${app.id}')">إرسال سبب الرفض</button>
                             </div>
                             <div class="card-actions">
-                                <button class="btn-action btn-confirm" onclick="triggerAction('${app.firebaseId}', 'confirmed', 'تمت الموافقة وتأكيد حجز كارتات شركتكم بنجاح!')">قبول</button>
-                                <button class="btn-action btn-postpone" onclick="togglePostponeBox('${app.firebaseId}')">تأجيل</button>
-                                <button class="btn-action btn-reject" onclick="toggleRejectBox('${app.firebaseId}')">رفض</button>
+                                <button class="btn-action btn-confirm" onclick="triggerAction('${app.id}', 'confirmed', 'تمت الموافقة وتأكيد حجز كارتات شركتكم بنجاح!')">قبول</button>
+                                <button class="btn-action btn-postpone" onclick="togglePostponeBox('${app.id}')">تأجيل</button>
+                                <button class="btn-action btn-reject" onclick="toggleRejectBox('${app.id}')">رفض</button>
                             </div>
                         </div>
                     `;
