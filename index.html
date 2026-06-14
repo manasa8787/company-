@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>تطبيق الحجوزات الاحترافي المطور</title>
+    <title>تطبيق الحجوزات الاحترافي المطور - سحابي</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
 
@@ -475,10 +475,9 @@
 
     <div class="app-container">
         
-        <!-- ================= 1. واجهة الحجز والمتابعة العامة ================= -->
         <div id="userBookingScreen" class="flat-card">
             <div class="brand-logo" id="mainLogoLetter">ح</div>
-            <div class="brand-name" id="displaySystemName">منصة الحجز الذكية</div>
+            <div class="brand-name" id="displaySystemName">جاري تحميل المنصة...</div>
             <div class="brand-subtitle">تقديم ومتابعة الحجوزات الفورية الشاملة</div>
 
             <div class="user-tabs">
@@ -487,7 +486,6 @@
                 <button id="userTabStatus" class="user-tab-btn" onclick="switchUserForm('status')">استعلام عن حجز</button>
             </div>
 
-            <!-- استمارة العيادات الطبية -->
             <form id="formUserClinic" onsubmit="submitUserClinic(event)">
                 <div class="form-group">
                     <label>اسم المريض الثلاثي</label>
@@ -512,7 +510,6 @@
                 <button type="submit" class="btn-submit">إرسال الحجز وتأكيد بالواتساب</button>
             </form>
 
-            <!-- استمارة حجز الشركات -->
             <form id="formUserCompany" onsubmit="submitUserCompany(event)" style="display: none;">
                 <div class="form-group">
                     <label>اسم الشركة</label>
@@ -533,7 +530,6 @@
                 <button type="submit" class="btn-submit">إرسال الحجز وتأكيد بالواتساب</button>
             </form>
 
-            <!-- واجهة استعلام المراجعين -->
             <div id="divUserStatusSearch" style="display: none;">
                 <div class="form-group">
                     <label>أدخل اسم الشركة، المندوب، أو رقم الهاتف</label>
@@ -546,7 +542,6 @@
             <button class="btn-admin-toggle" id="btnGoToLogin" onclick="showLoginScreen()">دخول الإدارة ←</button>
         </div>
 
-        <!-- ================= 2. شاشة تسجيل دخول الإدارة الديناميكية ================= -->
         <div id="loginScreen" class="flat-card" style="display: none;">
             <div class="brand-logo">ق</div>
             <div class="brand-name" id="loginScreenTitle">بوابة الإدارة</div>
@@ -567,7 +562,6 @@
             <button class="btn-admin-toggle" style="border-color: var(--text-muted); color: var(--text-muted);" onclick="showUserBookingScreen()">← العودة للرئيسية</button>
         </div>
 
-        <!-- ================= 3. شاشة لوحة التحكم الإدارية الكاملة ================= -->
         <div id="dashboardScreen" class="dashboard-screen">
             
             <div class="dash-header-card">
@@ -590,25 +584,28 @@
                 </div>
             </div>
 
-            <!-- لوحة إعدادات الهوية والتعطيل والإقسام -->
             <div class="config-card">
-                <div style="font-size: 13px; font-weight: bold; border-bottom: 1px dashed var(--input-border); padding-bottom: 5px;">⚙️ الإعدادات العامة للمنصة</div>
+                <div style="font-size: 13px; font-weight: bold; border-bottom: 1px dashed var(--input-border); padding-bottom: 5px;">⚙️ الإعدادات العامة للمنصة (سحابية)</div>
                 
                 <div class="config-row">
+                    <span class="config-title">رقم هاتف مدير التطبيق:</span>
+                    <input type="tel" id="cfgAdminPhone" class="input-short" style="width:140px; text-align:left;" placeholder="9647xxxxxxxx" onchange="updateSettingsOnFirebase()">
+                </div>
+                <div class="config-row">
                     <span class="config-title">اسم العيادة:</span>
-                    <input type="text" id="cfgClinicName" class="input-short" style="width:140px; text-align:right;" onchange="updateSystemNames()">
+                    <input type="text" id="cfgClinicName" class="input-short" style="width:140px; text-align:right;" onchange="updateSettingsOnFirebase()">
                 </div>
                 <div class="config-row">
                     <span class="config-title">اسم نظام الشركات:</span>
-                    <input type="text" id="cfgCompanyName" class="input-short" style="width:140px; text-align:right;" onchange="updateSystemNames()">
+                    <input type="text" id="cfgCompanyName" class="input-short" style="width:140px; text-align:right;" onchange="updateSettingsOnFirebase()">
                 </div>
                 <div class="config-row">
                     <span class="config-title">حد تقديم الشركات الشهري:</span>
-                    <input type="number" id="monthlyLimit" class="input-short" value="4" min="1" onchange="updateMonthlyLimit(this.value)">
+                    <input type="number" id="monthlyLimit" class="input-short" value="4" min="1" onchange="updateSettingsOnFirebase()">
                 </div>
                 <div class="config-row">
                     <span class="config-title">يوم عطلة العيادة:</span>
-                    <select id="cfgClinicHoliday" class="input-short" style="width:140px;" onchange="updateHolidays()">
+                    <select id="cfgClinicHoliday" class="input-short" style="width:140px;" onchange="updateSettingsOnFirebase()">
                         <option value="">لا يوجد عطلة</option>
                         <option value="0">الأحد</option>
                         <option value="1">الأثنين</option>
@@ -621,7 +618,7 @@
                 </div>
                 <div class="config-row">
                     <span class="config-title">يوم عطلة الشركات:</span>
-                    <select id="cfgCompanyHoliday" class="input-short" style="width:140px;" onchange="updateHolidays()">
+                    <select id="cfgCompanyHoliday" class="input-short" style="width:140px;" onchange="updateSettingsOnFirebase()">
                         <option value="">لا يوجد عطلة</option>
                         <option value="0">الأحد</option>
                         <option value="1">الأثنين</option>
@@ -647,121 +644,128 @@
             <div class="section-title">طلبات الحجوزات الحالية</div>
             <div id="appointmentsList" class="appointments-list"></div>
 
-            <div class="footer-note">نظام حجز المواعيد الذكي الشامل © 2026</div>
+            <div class="footer-note">نظام حجز المواعيد الذكي السامل السحابي © 2026</div>
         </div>
 
     </div>
 
-    <script>
-        // مصفوفة البيانات الافتراضية
-        const defaultAppointments = [
-            { id: 1, type: "clinic", patientName: "أحمد علي حسين", phone: "07701234567", sequence: 1, dateTime: "2026-06-15 10:30", clinicDetail: "عيادة الأسنان", status: "waiting" },
-            { id: 2, type: "company", receiptNo: "REC-1001", companyName: "شركة دجلة", delegateName: "كرار أسعد", amount: "٥٠٠,٠٠٠ د.ع", date: "2026-06-15 14:00", status: "waiting" }
-        ];
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+        // ⚠️ ضَع إعدادات حساب الـ Firebase الخاص بك هنا ⚠️
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // تهيئة السيرفر
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // متغيرات النظام العامة المزامنة مع السيرفر
+        let appointments = [];
         const daysOfWeek = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
-
-        let appointments = JSON.parse(localStorage.getItem('appointments')) || defaultAppointments;
-        let globalMonthlyLimit = parseInt(localStorage.getItem('globalMonthlyLimit')) || 4;
         
-        // إعدادات التسميات والعطل الديناميكية الجديدة
-        let clinicSystemName = localStorage.getItem('clinicSystemName') || "عيادة الشفاء الطبية";
-        let companySystemName = localStorage.getItem('companySystemName') || "شركة دجلة للتوزيع";
-        let clinicHoliday = localStorage.getItem('clinicHoliday') || ""; // خالية تعني لا يوجد عطلة
-        let companyHoliday = localStorage.getItem('companyHoliday') || "";
+        let configSystem = {
+            clinicSystemName: "عيادة الشفاء الطبية",
+            companySystemName: "شركة دجلة للتوزيع",
+            clinicHoliday: "",
+            companyHoliday: "",
+            globalMonthlyLimit: 4,
+            adminPhone: ""
+        };
 
         let currentFilter = 'all';
         let adminSearchQuery = '';
 
-        // تطبيق التسميات والإعدادات عند تشغيل التطبيق لأول مرة
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById('monthlyLimit').value = globalMonthlyLimit;
-            document.getElementById('cfgClinicName').value = clinicSystemName;
-            document.getElementById('cfgCompanyName').value = companySystemName;
-            document.getElementById('cfgClinicHoliday').value = clinicHoliday;
-            document.getElementById('cfgCompanyHoliday').value = companyHoliday;
+        // أولاً: الاستماع لمتغيرات الإعدادات من السيرفر بشكل حي وثابت
+        onValue(ref(database, 'settings'), (snapshot) => {
+            if(snapshot.exists()) {
+                configSystem = snapshot.val();
+            }
             applySystemBranding();
+            updateConfigFieldsUI();
+        });
+
+        // ثانياً: الاستماع لجدول الحجوزات بشكل حي وتحديث لوحة التحكم فوراً عند أي تغيير
+        onValue(ref(database, 'appointments'), (snapshot) => {
+            appointments = [];
+            if(snapshot.exists()) {
+                const data = snapshot.val();
+                for(let id in data) {
+                    appointments.push({ firebaseId: id, ...data[id] });
+                }
+            }
+            renderDashboard();
+            liveCheckStatus();
         });
 
         function applySystemBranding() {
-            document.getElementById('userTabClinic').innerText = "حجز " + clinicSystemName;
-            document.getElementById('userTabCompany').innerText = "حجز " + companySystemName;
-            document.getElementById('displaySystemName').innerText = clinicSystemName + " & " + companySystemName;
-            document.getElementById('loginScreenTitle').innerText = "بوابة إدارة " + clinicSystemName;
+            document.getElementById('userTabClinic').innerText = "حجز " + (configSystem.clinicSystemName || "العيادة");
+            document.getElementById('userTabCompany').innerText = "حجز " + (configSystem.companySystemName || "الشركة");
+            document.getElementById('displaySystemName').innerText = (configSystem.clinicSystemName || "العيادة") + " & " + (configSystem.companySystemName || "الشركة");
+            document.getElementById('loginScreenTitle').innerText = "بوابة إدارة " + (configSystem.clinicSystemName || "المنصة");
         }
 
-        function updateSystemNames() {
-            clinicSystemName = document.getElementById('cfgClinicName').value.trim() || "العيادة";
-            companySystemName = document.getElementById('cfgCompanyName').value.trim() || "الشركة";
-            localStorage.setItem('clinicSystemName', clinicSystemName);
-            localStorage.setItem('companySystemName', companySystemName);
-            applySystemBranding();
+        function updateConfigFieldsUI() {
+            document.getElementById('monthlyLimit').value = configSystem.globalMonthlyLimit || 4;
+            document.getElementById('cfgClinicName').value = configSystem.clinicSystemName || "";
+            document.getElementById('cfgCompanyName').value = configSystem.companySystemName || "";
+            document.getElementById('cfgClinicHoliday').value = configSystem.clinicHoliday || "";
+            document.getElementById('cfgCompanyHoliday').value = configSystem.companyHoliday || "";
+            document.getElementById('cfgAdminPhone').value = configSystem.adminPhone || "";
         }
 
-        function updateHolidays() {
-            clinicHoliday = document.getElementById('cfgClinicHoliday').value;
-            companyHoliday = document.getElementById('cfgCompanyHoliday').value;
-            localStorage.setItem('clinicHoliday', clinicHoliday);
-            localStorage.setItem('companyHoliday', companyHoliday);
-        }
+        // حفظ التغييرات في الإعدادات إلى السيرفر
+        window.updateSettingsOnFirebase = function() {
+            const updatedConfig = {
+                clinicSystemName: document.getElementById('cfgClinicName').value.trim() || "العيادة",
+                companySystemName: document.getElementById('cfgCompanyName').value.trim() || "الشركة",
+                globalMonthlyLimit: parseInt(document.getElementById('monthlyLimit').value) || 4,
+                clinicHoliday: document.getElementById('cfgClinicHoliday').value,
+                companyHoliday: document.getElementById('cfgCompanyHoliday').value,
+                adminPhone: document.getElementById('cfgAdminPhone').value.trim()
+            };
+            set(ref(database, 'settings'), updatedConfig);
+        };
 
-        function formatCurrency(input) {
-            let value = input.value.replace(/[^\d]/g, '');
-            if(value) {
-                let formatted = Number(value).toLocaleString('en-US');
-                let arabicNumbers = formatted.replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
-                input.value = arabicNumbers + " د.ع";
+        function sendWhatsAppMessage(text) {
+            if(configSystem.adminPhone) {
+                window.open(`https://wa.me/${configSystem.adminPhone}?text=${text}`, '_blank');
             } else {
-                input.value = '';
+                window.open(`https://wa.me/?text=${text}`, '_blank');
             }
         }
 
-        function switchUserForm(formType) {
-            document.getElementById('userTabClinic').classList.remove('active');
-            document.getElementById('userTabCompany').classList.remove('active');
-            document.getElementById('userTabStatus').classList.remove('active');
-            
-            document.getElementById('formUserClinic').style.display = 'none';
-            document.getElementById('formUserCompany').style.display = 'none';
-            document.getElementById('divUserStatusSearch').style.display = 'none';
-
-            if(formType === 'clinic') {
-                document.getElementById('userTabClinic').classList.add('active');
-                document.getElementById('formUserClinic').style.display = 'block';
-            } else if(formType === 'company') {
-                document.getElementById('userTabCompany').classList.add('active');
-                document.getElementById('formUserCompany').style.display = 'block';
-            } else if(formType === 'status') {
-                document.getElementById('userTabStatus').classList.add('active');
-                document.getElementById('divUserStatusSearch').style.display = 'block';
-                liveCheckStatus();
-            }
-        }
-
-        // فحص العطلات الأسبوعية بناءً على التاريخ المختار
         function isHolidaySelected(dateString, holidayConfig) {
             if (!holidayConfig) return false;
             const chosenDate = new Date(dateString);
-            const dayOfWeek = chosenDate.getDay(); // 0 للأحد، 1 للأثنين... إلخ
-            return dayOfWeek === parseInt(holidayConfig);
+            return chosenDate.getDay() === parseInt(holidayConfig);
         }
 
-        function submitUserClinic(event) {
+        // معالجة إرسال حجز العيادة إلى الـ Firebase والواتساب
+        window.submitUserClinic = function(event) {
             event.preventDefault();
             const name = document.getElementById('pName').value.trim();
             const phone = document.getElementById('pPhone').value.trim();
             const clinic = document.getElementById('pClinic').value;
             const datetimeInput = document.getElementById('pDateTime').value;
 
-            if (isHolidaySelected(datetimeInput, clinicHoliday)) {
-                alert(`عذراً، هذا اليوم يصادف يوم عطلة العيادة الأسبوعية (${daysOfWeek[clinicHoliday]}). يرجى اختيار تاريخ آخر.`);
+            if (isHolidaySelected(datetimeInput, configSystem.clinicHoliday)) {
+                alert(`عذراً، هذا اليوم يصادف يوم عطلة العيادة الأسبوعية (${daysOfWeek[configSystem.clinicHoliday]}). يرجى اختيار تاريخ آخر.`);
                 return;
             }
 
             const datetime = datetimeInput.replace('T', ' ');
             const currentClinicBookings = appointments.filter(a => a.type === 'clinic' && a.clinicDetail === clinic);
             const nextSequence = currentClinicBookings.length + 1;
-            const newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 1;
+            const newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id || 0)) + 1 : 1;
             
             const newBooking = {
                 id: newId,
@@ -774,36 +778,36 @@
                 status: "waiting"
             };
 
-            appointments.push(newBooking);
-            saveData();
+            push(ref(database, 'appointments'), newBooking).then(() => {
+                const msg = `*طلب حجز عيادة جديد*%0A-------------------------%0A• *اسم المريض:* ${name}%0A• *رقم الهاتف:* ${phone}%0A• *العيادة:* ${clinic}%0A• *الموعد:* ${datetime}%0A• *رقم التسلسل:* # ${nextSequence}%0A-------------------------`;
+                sendWhatsAppMessage(msg);
+                alert(`تم تسجيل حجزك بنجاح وتسلسلك هو: (# ${nextSequence}).`);
+                document.getElementById('formUserClinic').reset();
+            });
+        };
 
-            const msg = `*طلب حجز عيادة جديد*%0A-------------------------%0A• *اسم المريض:* ${name}%0A• *رقم الهاتف:* ${phone}%0A• *العيادة:* ${clinic}%0A• *الموعد:* ${datetime}%0A• *رقم التسلسل:* # ${nextSequence}%0A-------------------------`;
-            window.open(`https://wa.me/?text=${msg}`, '_blank');
-            alert(`تم تسجيل حجزك بنجاح وتسلسلك هو: (# ${nextSequence}).`);
-            document.getElementById('formUserClinic').reset();
-        }
-
-        function submitUserCompany(event) {
+        // معالجة إرسال طلبات الشركات مع قيود السيرفر الديناميكية
+        window.submitUserCompany = function(event) {
             event.preventDefault();
             const company = document.getElementById('cName').value.trim();
             const delegate = document.getElementById('cDelegate').value.trim();
             const amount = document.getElementById('cAmount').value.trim();
             const dateInput = document.getElementById('cDate').value;
 
-            if (isHolidaySelected(dateInput, companyHoliday)) {
-                alert(`عذراً، هذا اليوم يصادف يوم عطلة الشركات الأسبوعية (${daysOfWeek[companyHoliday]}). يرجى اختيار تاريخ آخر.`);
+            if (isHolidaySelected(dateInput, configSystem.companyHoliday)) {
+                alert(`عذراً، هذا اليوم يصادف يوم عطلة الشركات الأسبوعية (${daysOfWeek[configSystem.companyHoliday]}). يرجى اختيار تاريخ آخر.`);
                 return;
             }
 
             const date = dateInput.replace('T', ' ');
             const companyBookingsCount = appointments.filter(a => a.type === 'company' && a.companyName.toLowerCase() === company.toLowerCase()).length;
 
-            if (companyBookingsCount >= globalMonthlyLimit) {
-                alert(`عذراً! تجاوزت شركة (${company}) حد التقديم الشهري المسموح به وهو (${globalMonthlyLimit}) مرات.`);
+            if (companyBookingsCount >= configSystem.globalMonthlyLimit) {
+                alert(`عذراً! تجاوزت شركة (${company}) حد التقديم الشهري المسموح به وهو (${configSystem.globalMonthlyLimit}) مرات.`);
                 return;
             }
 
-            const newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id)) + 1 : 1;
+            const newId = appointments.length > 0 ? Math.max(...appointments.map(a => a.id || 0)) + 1 : 1;
             const nextReceiptNo = "REC-" + (1000 + newId);
 
             const newBooking = {
@@ -817,22 +821,23 @@
                 status: "waiting"
             };
 
-            appointments.push(newBooking);
-            saveData();
+            push(ref(database, 'appointments'), newBooking).then(() => {
+                const msg = `*طلب استحصال كارتات شركات*%0A-------------------------%0A• *رقم الوصل الفريد:* ${nextReceiptNo}%0A• *اسم الشركة:* ${company}%0A• *اسم المندوب:* ${delegate}%0A• *المبلغ المراد استحصاله:* ${amount}%0A• *التاريخ والوقت المطلوب:* ${date}%0A-------------------------`;
+                sendWhatsAppMessage(msg);
+                alert(`تم إرسال طلب شركة بنجاح! رقم الوصل: (${nextReceiptNo}).`);
+                document.getElementById('formUserCompany').reset();
+            });
+        };
 
-            const msg = `*طلب استحصال كارتات شركات*%0A-------------------------%0A• *رقم الوصل الفريد:* ${nextReceiptNo}%0A• *اسم الشركة:* ${company}%0A• *اسم المندوب:* ${delegate}%0A• *المبلغ المراد استحصاله:* ${amount}%0A• *التاريخ والوقت المطلوب:* ${date}%0A-------------------------`;
-            window.open(`https://wa.me/?text=${msg}`, '_blank');
-            alert(`تم إرسال طلب شركة بنجاح! رقم الوصل: (${nextReceiptNo}).`);
-            document.getElementById('formUserCompany').reset();
-        }
-
-        function liveCheckStatus() {
+        // واجهة استعلام المراجعين الفوري المربوط بالسيرفر الموحد
+        window.liveCheckStatus = function() {
             const queryInput = document.getElementById('searchStatusPhone').value.trim().toLowerCase();
             const container = document.getElementById('statusResultContainer');
+            if(!container) return;
             container.innerHTML = '';
 
             if(!queryInput) {
-                container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:12px; padding:10px;">يرجى إدخال أي تفاصيل لبدء الاستعلام الفوري</div>`;
+                container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:12px; padding:10px;">يرجى إدخال أي تفاصيل لبدء الاستعلام الفوري من السيرفر</div>`;
                 return;
             }
 
@@ -867,69 +872,87 @@
                 `;
                 container.innerHTML += html;
             });
-        }
+        };
 
-        function saveData() {
-            localStorage.setItem('appointments', JSON.stringify(appointments));
-            localStorage.setItem('globalMonthlyLimit', globalMonthlyLimit.toString());
-        }
-
-        function handleAdminSearch(query) {
+        window.handleAdminSearch = function(query) {
             adminSearchQuery = query.toLowerCase().trim();
             renderDashboard();
-        }
+        };
 
-        function showLoginScreen() {
-            document.getElementById('userBookingScreen').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'block';
-        }
+        window.triggerAction = function(firebaseId, status, notifyText) {
+            update(ref(database, `appointments/${firebaseId}`), { status: status }).then(() => {
+                const target = appointments.find(app => app.firebaseId === firebaseId);
+                const msg = `*إشعار من الإدارة*%0A-------------------------%0A• *الحالة:* ${notifyText}%0A• *الجهة/الاسم:* ${target.type === 'clinic' ? target.patientName : target.companyName}%0A-------------------------`;
+                sendWhatsAppMessage(msg);
+            });
+        };
 
-        function showUserBookingScreen() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('userBookingScreen').style.display = 'block';
-        }
-
-        function handleLogin(event) {
-            event.preventDefault();
-            const email = document.getElementById('adminEmail').value.trim();
-            const password = document.getElementById('adminPassword').value.trim();
-            const errorDiv = document.getElementById('errorMessage');
-
-            errorDiv.style.display = 'none';
-
-            if (email.toLowerCase() === "manasa.iraq2026@gmail.com" && password === "19001800") {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('dashboardScreen').style.display = 'block';
-                renderDashboard();
-            } else {
-                errorDiv.innerText = "البريد الإلكتروني أو كلمة المرور غير صحيحة!";
-                errorDiv.style.display = 'block';
+        window.submitPostpone = function(firebaseId, type) {
+            const inputVal = document.getElementById(`newDateTime-${firebaseId}`).value;
+            if(!inputVal) {
+                alert("يرجى اختيار التاريخ والوقت الجديد أولاً!");
+                return;
             }
-        }
 
-        function handleLogout() {
-            document.getElementById('dashboardScreen').style.display = 'none';
-            document.getElementById('userBookingScreen').style.display = 'block';
-            document.getElementById('loginForm').reset();
-            document.getElementById('adminSearchInput').value = '';
-            adminSearchQuery = '';
-        }
+            const activeHoliday = (type === 'clinic') ? configSystem.clinicHoliday : configSystem.companyHoliday;
+            if (isHolidaySelected(inputVal, activeHoliday)) {
+                alert(`لا يمكن التأجيل لهذا اليوم لأنه يصادف يوم العطلة الأسبوعية المعتمد (${daysOfWeek[activeHoliday]})!`);
+                return;
+            }
+            
+            const formattedDate = inputVal.replace('T', ' ');
+            const updates = { status: 'postponed' };
+            if(type === 'clinic') updates.dateTime = formattedDate;
+            else updates.date = formattedDate;
 
-        function updateMonthlyLimit(val) {
-            globalMonthlyLimit = parseInt(val) || 4;
-            saveData();
-        }
+            update(ref(database, `appointments/${firebaseId}`), updates).then(() => {
+                const target = appointments.find(app => app.firebaseId === firebaseId);
+                const msg = `*إشعار تأجيل موعد الحجز*%0A-------------------------%0A• *الجهة:* ${target.type === 'clinic' ? target.patientName : target.companyName}%0A• *الموعد الجديد المعتمد:* ${formattedDate}%0A-------------------------`;
+                sendWhatsAppMessage(msg);
+                alert("تم تحديث الموعد وتأجيل الطلب بنجاح!");
+            });
+        };
+
+        window.submitReject = function(firebaseId) {
+            const reason = document.getElementById(`rejectReasonInput-${firebaseId}`).value.trim() || "لم يذكر سبب محدد";
+            update(ref(database, `appointments/${firebaseId}`), { status: 'rejected', rejectReason: reason }).then(() => {
+                const target = appointments.find(app => app.firebaseId === firebaseId);
+                const msg = `*إشعار رفض طلب الحجز 🔴*%0A-------------------------%0A• *الجهة/الشركة:* ${target.companyName}%0A• *سبب الرفض الصادر:* ${reason}%0A-------------------------`;
+                sendWhatsAppMessage(msg);
+                alert("تم رفض الطلب بنجاح.");
+            });
+        };
+
+        window.deleteAppointment = function(firebaseId) {
+            if(confirm("هل أنت متأكد من حذف الحجز نهائياً من السيرفر السحابي؟")) {
+                remove(ref(database, `appointments/${firebaseId}`));
+            }
+        };
+
+        window.switchTab = function(tabType) {
+            currentFilter = tabType;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            if(tabType === 'all') document.getElementById('tabAll').classList.add('active');
+            if(tabType === 'clinic') document.getElementById('tabClinics').classList.add('active');
+            if(tabType === 'company') document.getElementById('tabCompanies').classList.add('active');
+            renderDashboard();
+        };
 
         function renderDashboard() {
             const total = appointments.length;
             const pending = appointments.filter(a => a.status === 'waiting').length;
             const success = appointments.filter(a => a.status === 'confirmed').length;
 
-            document.getElementById('totalCount').innerText = total;
-            document.getElementById('pendingCount').innerText = pending;
-            document.getElementById('successCount').innerText = success;
-
+            const totalEl = document.getElementById('totalCount');
+            const pendingEl = document.getElementById('pendingCount');
+            const successEl = document.getElementById('successCount');
             const listContainer = document.getElementById('appointmentsList');
+
+            if(totalEl) totalEl.innerText = total;
+            if(pendingEl) pendingEl.innerText = pending;
+            if(successEl) successEl.innerText = success;
+            if(!listContainer) return;
+            
             listContainer.innerHTML = '';
 
             let filtered = appointments.filter(a => currentFilter === 'all' || a.type === currentFilter);
@@ -970,17 +993,15 @@
                                 <div class="detail-item"><span class="detail-label">العيادة:</span><span class="detail-value">${app.clinicDetail}</span></div>
                                 <div class="detail-item"><span class="detail-label">التاريخ والوقت:</span><span class="detail-value" style="color:var(--primary-color); font-weight:700;">${app.dateTime}</span></div>
                             </div>
-
-                            <div id="postponeBox-${app.id}" class="postpone-box">
+                            <div id="postponeBox-${app.firebaseId}" class="postpone-box">
                                 <label style="font-size:11px; font-weight:700;">اختر موعد التأجيل الجديد بالوقت:</label>
-                                <input type="datetime-local" id="newDateTime-${app.id}">
-                                <button class="btn-action btn-confirm" style="padding:6px; font-size:11px;" onclick="submitPostpone(${app.id}, 'clinic')">تأكيد الموعد الجديد</button>
+                                <input type="datetime-local" id="newDateTime-${app.firebaseId}">
+                                <button class="btn-action btn-confirm" style="padding:6px; font-size:11px;" onclick="submitPostpone('${app.firebaseId}', 'clinic')">تأكيد الموعد الجديد</button>
                             </div>
-
                             <div class="card-actions">
-                                <button class="btn-action btn-confirm" onclick="triggerAction(${app.id}, 'confirmed', 'تم قبول حجز العيادة الخاص بك بنجاح!')">قبول</button>
-                                <button class="btn-action btn-postpone" onclick="togglePostponeBox(${app.id})">تأجيل</button>
-                                <button class="btn-action btn-delete" onclick="deleteAppointment(${app.id})">حذف</button>
+                                <button class="btn-action btn-confirm" onclick="triggerAction('${app.firebaseId}', 'confirmed', 'تم قبول حجز العيادة الخاص بك بنجاح!')">قبول</button>
+                                <button class="btn-action btn-postpone" onclick="togglePostponeBox('${app.firebaseId}')">تأجيل</button>
+                                <button class="btn-action btn-delete" onclick="deleteAppointment('${app.firebaseId}')">حذف</button>
                             </div>
                         </div>
                     `;
@@ -996,23 +1017,20 @@
                                 <div class="detail-item"><span class="detail-label">مبلغ الاستحصال:</span><span class="detail-value" style="color:var(--success-color); font-weight:700;">${app.amount}</span></div>
                                 <div class="detail-item"><span class="detail-label">التاريخ والوقت:</span><span class="detail-value" style="color:var(--primary-color); font-weight:700;">${app.date}</span></div>
                             </div>
-
-                            <div id="postponeBox-${app.id}" class="postpone-box">
+                            <div id="postponeBox-${app.firebaseId}" class="postpone-box">
                                 <label style="font-size:11px; font-weight:700;">اختر التاريخ والوقت الجديد للشركة:</label>
-                                <input type="datetime-local" id="newDateTime-${app.id}">
-                                <button class="btn-action btn-confirm" style="padding:6px; font-size:11px;" onclick="submitPostpone(${app.id}, 'company')">تأكيد التأجيل الجديد</button>
+                                <input type="datetime-local" id="newDateTime-${app.firebaseId}">
+                                <button class="btn-action btn-confirm" style="padding:6px; font-size:11px;" onclick="submitPostpone('${app.firebaseId}', 'company')">تأكيد التأجيل الجديد</button>
                             </div>
-
-                            <div id="rejectBox-${app.id}" class="reject-box">
+                            <div id="rejectBox-${app.firebaseId}" class="reject-box">
                                 <label style="font-size:11px; font-weight:700; color:var(--error-color);">اكتب سبب الرفض:</label>
-                                <input type="text" id="rejectReasonInput-${app.id}" placeholder="مثال: تجاوز السقف المالي أو نقص مستندات">
-                                <button class="btn-action btn-reject" style="padding:6px; font-size:11px;" onclick="submitReject(${app.id})">إرسال سبب الرفض</button>
+                                <input type="text" id="rejectReasonInput-${app.firebaseId}" placeholder="مثال: تجاوز السقف المالي">
+                                <button class="btn-action btn-reject" style="padding:6px; font-size:11px;" onclick="submitReject('${app.firebaseId}')">إرسال سبب الرفض</button>
                             </div>
-
                             <div class="card-actions">
-                                <button class="btn-action btn-confirm" onclick="triggerAction(${app.id}, 'confirmed', 'تمت الموافقة وتأكيد حجز كارتات شركتكم بنجاح!')">قبول</button>
-                                <button class="btn-action btn-postpone" onclick="togglePostponeBox(${app.id})">تأجيل</button>
-                                <button class="btn-action btn-reject" onclick="toggleRejectBox(${app.id})">رفض</button>
+                                <button class="btn-action btn-confirm" onclick="triggerAction('${app.firebaseId}', 'confirmed', 'تمت الموافقة وتأكيد حجز كارتات شركتكم بنجاح!')">قبول</button>
+                                <button class="btn-action btn-postpone" onclick="togglePostponeBox('${app.firebaseId}')">تأجيل</button>
+                                <button class="btn-action btn-reject" onclick="toggleRejectBox('${app.firebaseId}')">رفض</button>
                             </div>
                         </div>
                     `;
@@ -1021,89 +1039,82 @@
                 listContainer.innerHTML += cardContent;
             });
         }
+    </script>
+
+    <script>
+        function formatCurrency(input) {
+            let value = input.value.replace(/[^\d]/g, '');
+            if(value) {
+                let formatted = Number(value).toLocaleString('en-US');
+                let arabicNumbers = formatted.replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+                input.value = arabicNumbers + " د.ع";
+            } else {
+                input.value = '';
+            }
+        }
+
+        function switchUserForm(formType) {
+            document.getElementById('userTabClinic').classList.remove('active');
+            document.getElementById('userTabCompany').classList.remove('active');
+            document.getElementById('userTabStatus').classList.remove('active');
+            document.getElementById('formUserClinic').style.display = 'none';
+            document.getElementById('formUserCompany').style.display = 'none';
+            document.getElementById('divUserStatusSearch').style.display = 'none';
+
+            if(formType === 'clinic') {
+                document.getElementById('userTabClinic').classList.add('active');
+                document.getElementById('formUserClinic').style.display = 'block';
+            } else if(formType === 'company') {
+                document.getElementById('userTabCompany').classList.add('active');
+                document.getElementById('formUserCompany').style.display = 'block';
+            } else if(formType === 'status') {
+                document.getElementById('userTabStatus').classList.add('active');
+                document.getElementById('divUserStatusSearch').style.display = 'block';
+                if(typeof window.liveCheckStatus === 'function') window.liveCheckStatus();
+            }
+        }
+
+        function showLoginScreen() {
+            document.getElementById('userBookingScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'block';
+        }
+
+        function showUserBookingScreen() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('userBookingScreen').style.display = 'block';
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.style.display = 'none';
+
+            if (email.toLowerCase() === "manasa.iraq2026@gmail.com" && password === "19001800") {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboardScreen').style.display = 'block';
+            } else {
+                errorDiv.innerText = "البريد الإلكتروني أو كلمة المرور غير صحيحة!";
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById('dashboardScreen').style.display = 'none';
+            document.getElementById('userBookingScreen').style.display = 'block';
+            document.getElementById('loginForm').reset();
+            document.getElementById('adminSearchInput').value = '';
+        }
 
         function togglePostponeBox(id) {
             const box = document.getElementById(`postponeBox-${id}`);
-            box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+            if(box) box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
         }
 
         function toggleRejectBox(id) {
             const box = document.getElementById(`rejectBox-${id}`);
-            box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        function triggerAction(id, status, notifyText) {
-            appointments = appointments.map(app => app.id === id ? { ...app, status: status } : app);
-            saveData();
-            renderDashboard();
-
-            const target = appointments.find(app => app.id === id);
-            const msg = `*إشعار من الإدارة*%0A-------------------------%0A• *الحالة:* ${notifyText}%0A• *الجهة/الاسم:* ${target.type === 'clinic' ? target.patientName : target.companyName}%0A-------------------------`;
-            window.open(`https://wa.me/?text=${msg}`, '_blank');
-        }
-
-        function submitPostpone(id, type) {
-            const inputVal = document.getElementById(`newDateTime-${id}`).value;
-            if(!inputVal) {
-                alert("يرجى اختيار التاريخ والوقت الجديد أولاً!");
-                return;
-            }
-
-            // فحص عطلة اليوم المختار للتأجيل أيضاً
-            const activeHoliday = (type === 'clinic') ? clinicHoliday : companyHoliday;
-            if (isHolidaySelected(inputVal, activeHoliday)) {
-                alert(`لا يمكن التأجيل لهذا اليوم لأنه يصادف يوم العطلة الأسبوعية المعتمد (${daysOfWeek[activeHoliday]})!`);
-                return;
-            }
-            
-            const formattedDate = inputVal.replace('T', ' ');
-            
-            appointments = appointments.map(app => {
-                if(app.id === id) {
-                    if(type === 'clinic') return { ...app, dateTime: formattedDate, status: 'postponed' };
-                    return { ...app, date: formattedDate, status: 'postponed' };
-                }
-                return app;
-            });
-
-            saveData();
-            renderDashboard();
-
-            const target = appointments.find(app => app.id === id);
-            const msg = `*إشعار تأجيل موعد الحجز*%0A-------------------------%0A• *الجهة:* ${target.type === 'clinic' ? target.patientName : target.companyName}%0A• *الموعد الجديد المعتمد:* ${formattedDate}%0A-------------------------`;
-            window.open(`https://wa.me/?text=${msg}`, '_blank');
-            alert("تم التأجيل بنجاح!");
-        }
-
-        function submitReject(id) {
-            const reason = document.getElementById(`rejectReasonInput-${id}`).value.trim() || "لم يذكر سبب محدد";
-            appointments = appointments.map(app => app.id === id ? { ...app, status: 'rejected', rejectReason: reason } : app);
-            saveData();
-            renderDashboard();
-
-            const target = appointments.find(app => app.id === id);
-            const msg = `*إشعار رفض طلب الحجز 🔴*%0A-------------------------%0A• *الجهة/الشركة:* ${target.companyName}%0A• *سبب الرفض الصادر:* ${reason}%0A-------------------------`;
-            window.open(`https://wa.me/?text=${msg}`, '_blank');
-            alert("تم رفض الطلب.");
-        }
-
-        function switchTab(tabType) {
-            currentFilter = tabType;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            
-            if(tabType === 'all') document.getElementById('tabAll').classList.add('active');
-            if(tabType === 'clinic') document.getElementById('tabClinics').classList.add('active');
-            if(tabType === 'company') document.getElementById('tabCompanies').classList.add('active');
-
-            renderDashboard();
-        }
-
-        function deleteAppointment(id) {
-            if(confirm("هل أنت متأكد من حذف الحجز نهائياً؟")) {
-                appointments = appointments.filter(app => app.id !== id);
-                saveData();
-                renderDashboard();
-            }
+            if(box) box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
         }
     </script>
 </body>
